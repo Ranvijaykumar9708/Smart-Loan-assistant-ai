@@ -173,7 +173,7 @@ class BankDirectoryView extends StatelessWidget {
                   Expanded(
                     child: _buildInfoItem(
                       'Loan Amount',
-                      '₹${(bank.minLoanAmount / 100000).toStringAsFixed(0)}L - ₹${(bank.maxLoanAmount / 100000).toStringAsFixed(0)}L',
+                      '₹${(bank.minLoanAmount / 100000).toStringAsFixed(0)}L - ₹${(bank.maxLoanAmount / 1000000).toStringAsFixed(0)}cr',
                       Icons.currency_rupee,
                       Color(0xFFFFB84D),
                     ),

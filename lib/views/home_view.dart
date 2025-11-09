@@ -16,6 +16,7 @@ class HomeView extends StatefulWidget {
 class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
   late AnimationController _floatingController;
   late Animation<double> _floatingAnimation;
+  late TabController _tabController;
 
   @override
   void initState() {
@@ -28,11 +29,14 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
     _floatingAnimation = Tween<double>(begin: -10, end: 10).animate(
       CurvedAnimation(parent: _floatingController, curve: Curves.easeInOut),
     );
+
+    _tabController = TabController(length: 2, vsync: this, initialIndex: 0);
   }
 
   @override
   void dispose() {
     _floatingController.dispose();
+    _tabController.dispose();
     super.dispose();
   }
 
@@ -81,32 +85,13 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
           ),
 
           // Main Content
-          CustomScrollView(
-            physics: const BouncingScrollPhysics(),
-            slivers: [
-              // Ultra Modern App Bar
-              SliverAppBar(
-                expandedHeight: 200,
-                floating: false,
-                pinned: true,
-                backgroundColor: Colors.transparent,
-                elevation: 0,
-                actions: [
-                  IconButton(
-                    icon: const Icon(Icons.history, color: Colors.white),
-                    onPressed: () {
-                      Navigator.pushNamed(context, AppRouter.chatHistory);
-                    },
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.settings, color: Colors.white),
-                    onPressed: () {
-                      Navigator.pushNamed(context, AppRouter.settings);
-                    },
-                  ),
-                ],
-                flexibleSpace: FlexibleSpaceBar(
-                  background: Container(
+          Column(
+            children: [
+              // App Bar with Tabs
+              ClipRRect(
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                  child: Container(
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         begin: Alignment.topLeft,
@@ -119,13 +104,12 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
                       ),
                     ),
                     child: SafeArea(
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(24, 50, 24, 20),
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.end,
                           children: [
-                            Row(
+                          // Header
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(24, 20, 24, 10),
+                            child: Row(
                               children: [
                                 Hero(
                                   tag: 'app_icon',
@@ -189,582 +173,57 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
                                     ],
                                   ),
                                 ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-
-              // Content
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      // Modern Section Header
-                      _buildModernSectionHeader('Select Loan Type', Icons.apps_rounded),
-                      const SizedBox(height: 20),
-                      
-                      // Premium Loan Cards
-                      GridView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          crossAxisSpacing: 16,
-                          mainAxisSpacing: 16,
-                          childAspectRatio: 1.4,
-                        ),
-                        itemCount: loanTypes.length,
-                        itemBuilder: (context, index) {
-                          final loan = loanTypes[index];
-                          final isSelected = vm.loanType == loan.name;
-                          final loanColor = Color(loan.colorValue);
-                          
-                          return TweenAnimationBuilder<double>(
-                            tween: Tween(begin: 0, end: 1),
-                            duration: Duration(milliseconds: 400 + (index * 100)),
-                            curve: Curves.elasticOut,
-                            builder: (context, value, child) {
-                              return Transform.scale(
-                                scale: value,
-                                child: GestureDetector(
-                                  onTap: () => vm.setLoanType(loan.name),
-                                  child: AnimatedContainer(
-                                    duration: const Duration(milliseconds: 400),
-                                    curve: Curves.easeInOut,
-                                    decoration: BoxDecoration(
-                                      gradient: isSelected
-                                          ? LinearGradient(
-                                              colors: [
-                                                loanColor,
-                                                loanColor.withOpacity(0.7),
-                                              ],
-                                              begin: Alignment.topLeft,
-                                              end: Alignment.bottomRight,
-                                            )
-                                          : LinearGradient(
-                                              colors: [
-                                                Color(0xFF1A1A2E),
-                                                Color(0xFF16213E),
-                                              ],
-                                            ),
-                                      borderRadius: BorderRadius.circular(24),
-                                      border: Border.all(
-                                        color: isSelected
-                                            ? loanColor.withOpacity(0.5)
-                                            : Colors.white.withOpacity(0.05),
-                                        width: isSelected ? 2 : 1,
-                                      ),
-                                      boxShadow: isSelected
-                                          ? [
-                                              BoxShadow(
-                                                color: loanColor.withOpacity(0.4),
-                                                blurRadius: 25,
-                                                offset: const Offset(0, 12),
-                                              ),
-                                            ]
-                                          : [
-                                              BoxShadow(
-                                                color: Colors.black.withOpacity(0.3),
-                                                blurRadius: 10,
-                                                offset: const Offset(0, 5),
-                                              ),
-                                            ],
-                                    ),
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(24),
-                                      child: BackdropFilter(
-                                        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                                        child: Container(
-                                          padding: const EdgeInsets.all(12),
-                                          child: Column(
-                                            mainAxisAlignment: MainAxisAlignment.center,
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              Text(
-                                                loan.emoji,
-                                                style: TextStyle(fontSize: 28),
-                                              ),
-                                              const SizedBox(height: 6),
-                                              Flexible(
-                                                child: Text(
-                                                  loan.name,
-                                                  textAlign: TextAlign.center,
-                                                  maxLines: 2,
-                                                  overflow: TextOverflow.ellipsis,
-                                                  style: TextStyle(
-                                                    fontSize: 12,
-                                                    fontWeight: FontWeight.w700,
-                                                    color: Colors.white,
-                                                    letterSpacing: 0.3,
-                                                    height: 1.2,
-                                                  ),
-                                                ),
-                                              ),
-                                              if (isSelected) ...[
-                                                const SizedBox(height: 4),
-                                                Container(
-                                                  padding: EdgeInsets.symmetric(
-                                                    horizontal: 8,
-                                                    vertical: 2,
-                                                  ),
-                                                  decoration: BoxDecoration(
-                                                    color: Colors.white.withOpacity(0.2),
-                                                    borderRadius: BorderRadius.circular(8),
-                                                  ),
-                                                  child: Text(
-                                                    '✓',
-                                                    style: TextStyle(
-                                                      fontSize: 10,
-                                                      color: Colors.white,
-                                                      fontWeight: FontWeight.w600,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
+                                IconButton(
+                                  icon: const Icon(Icons.history, color: Colors.white),
+                                  onPressed: () {
+                                    Navigator.pushNamed(context, AppRouter.chatHistory);
+                                  },
                                 ),
-                              );
-                            },
-                          );
-                        },
-                      ),
-
-                      const SizedBox(height: 40),
-
-                      // Quick Actions Section
-                      _buildModernSectionHeader('Quick Actions', Icons.flash_on),
-                      const SizedBox(height: 20),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _buildQuickActionCard(
-                              context,
-                              'EMI Calculator',
-                              Icons.calculate,
-                              Color(0xFF667eea),
-                              () => Navigator.pushNamed(context, AppRouter.emiCalculator),
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: _buildQuickActionCard(
-                              context,
-                              'Eligibility',
-                              Icons.verified_user,
-                              Color(0xFFf093fb),
-                              () => Navigator.pushNamed(context, AppRouter.loanEligibility),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _buildQuickActionCard(
-                              context,
-                              'Compare Loans',
-                              Icons.compare_arrows,
-                              Color(0xFF4ECDC4),
-                              () => Navigator.pushNamed(context, AppRouter.loanComparison),
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: _buildQuickActionCard(
-                              context,
-                              'Documents',
-                              Icons.folder_open,
-                              Color(0xFFFFB84D),
-                              () => Navigator.pushNamed(context, AppRouter.documentChecklist),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      _buildQuickActionCard(
-                        context,
-                        'Loan Tips & Advice',
-                        Icons.lightbulb_outline,
-                        Color(0xFFFFD700),
-                        () => Navigator.pushNamed(context, AppRouter.loanTips),
-                        fullWidth: true,
-                      ),
-                      const SizedBox(height: 16),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _buildQuickActionCard(
-                              context,
-                              'Amortization',
-                              Icons.table_chart,
-                              Color(0xFF667eea),
-                              () => Navigator.pushNamed(context, AppRouter.amortizationSchedule),
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: _buildQuickActionCard(
-                              context,
-                              'Prepayment',
-                              Icons.trending_down,
-                              Color(0xFF4ECDC4),
-                              () => Navigator.pushNamed(context, AppRouter.prepaymentCalculator),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      _buildQuickActionCard(
-                        context,
-                        'Banks & NBFCs',
-                        Icons.account_balance,
-                        Color(0xFFf093fb),
-                        () => Navigator.pushNamed(context, AppRouter.bankDirectory),
-                        fullWidth: true,
-                      ),
-
-                      const SizedBox(height: 40),
-
-                      // Question Section
-                      _buildModernSectionHeader('Your Question', Icons.chat_bubble_outline),
-                      const SizedBox(height: 20),
-                      
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(28),
-                        child: BackdropFilter(
-                          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                                colors: [
-                                  Colors.white.withOpacity(0.1),
-                                  Colors.white.withOpacity(0.05),
-                                ],
-                              ),
-                              borderRadius: BorderRadius.circular(28),
-                              border: Border.all(
-                                color: Colors.white.withOpacity(0.1),
-                                width: 1.5,
-                              ),
-                            ),
-                            child: Column(
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.all(20),
-                                  child: TextField(
-                                    onChanged: vm.setQuery,
-                                    maxLines: 5,
-                                    style: const TextStyle(
-                                      fontSize: 15,
-                                      height: 1.6,
-                                      color: Colors.white,
-                                    ),
-                                    decoration: InputDecoration(
-                                      hintText: 'Ask anything about ${vm.loanType.toLowerCase()}...',
-                                      hintStyle: TextStyle(
-                                        color: Colors.white.withOpacity(0.3),
-                                        fontSize: 15,
-                                      ),
-                                      border: InputBorder.none,
-                                      enabledBorder: InputBorder.none,
-                                      focusedBorder: InputBorder.none,
-                                    ),
-                                  ),
-                                ),
-                                Container(
-                                  padding: const EdgeInsets.all(20),
-                                  decoration: BoxDecoration(
-                                    border: Border(
-                                      top: BorderSide(
-                                        color: Colors.white.withOpacity(0.1),
-                                        width: 1,
-                                      ),
-                                    ),
-                                  ),
-                                  child: SingleChildScrollView(
-                                    scrollDirection: Axis.horizontal,
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Row(
-                                          children: [
-                                            Icon(
-                                              Icons.lightbulb_outline,
-                                              color: Colors.white.withOpacity(0.5),
-                                              size: 16,
-                                            ),
-                                            SizedBox(width: 6),
-                                            Text(
-                                              'Be specific',
-                                              style: TextStyle(
-                                                color: Colors.white.withOpacity(0.5),
-                                                fontSize: 11,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        const SizedBox(width: 12),
-                                        Row(
-                                          children: [
-                                            if (vm.isLoading)
-                                              GestureDetector(
-                                                onTap: () {
-                                                  // Call stop method if available in your view model
-                                                  // vm.stopGeneration();
-                                                },
-                                                child: Container(
-                                                  padding: const EdgeInsets.symmetric(
-                                                    horizontal: 16,
-                                                    vertical: 10,
-                                                  ),
-                                                  decoration: BoxDecoration(
-                                                    gradient: LinearGradient(
-                                                      colors: [Color(0xFFFF6B6B), Color(0xFFEE5A6F)],
-                                                    ),
-                                                    borderRadius: BorderRadius.circular(14),
-                                                    boxShadow: [
-                                                      BoxShadow(
-                                                        color: Color(0xFFFF6B6B).withOpacity(0.4),
-                                                        blurRadius: 12,
-                                                        offset: const Offset(0, 6),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  child: Row(
-                                                    mainAxisSize: MainAxisSize.min,
-                                                    children: [
-                                                      Icon(
-                                                        Icons.stop_circle_outlined,
-                                                        color: Colors.white,
-                                                        size: 16,
-                                                      ),
-                                                      const SizedBox(width: 6),
-                                                      Text(
-                                                        'Stop',
-                                                        style: const TextStyle(
-                                                          fontSize: 13,
-                                                          color: Colors.white,
-                                                          fontWeight: FontWeight.w700,
-                                                          letterSpacing: 0.3,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
-                                            if (vm.isLoading) const SizedBox(width: 10),
-                                            GestureDetector(
-                                              onTap: vm.isLoading ? null : vm.generateContent,
-                                              child: AnimatedContainer(
-                                                duration: const Duration(milliseconds: 300),
-                                                padding: const EdgeInsets.symmetric(
-                                                  horizontal: 20,
-                                                  vertical: 10,
-                                                ),
-                                                decoration: BoxDecoration(
-                                                  gradient: LinearGradient(
-                                                    colors: vm.isLoading
-                                                        ? [Colors.grey, Colors.grey.shade700]
-                                                        : [Color(0xFF667eea), Color(0xFF764ba2)],
-                                                  ),
-                                                  borderRadius: BorderRadius.circular(14),
-                                                  boxShadow: [
-                                                    BoxShadow(
-                                                      color: Color(0xFF667eea).withOpacity(0.4),
-                                                      blurRadius: 12,
-                                                      offset: const Offset(0, 6),
-                                                    ),
-                                                  ],
-                                                ),
-                                                child: Row(
-                                                  mainAxisSize: MainAxisSize.min,
-                                                  children: [
-                                                    if (vm.isLoading)
-                                                      SizedBox(
-                                                        height: 14,
-                                                        width: 14,
-                                                        child: CircularProgressIndicator(
-                                                          strokeWidth: 2,
-                                                          color: Colors.white,
-                                                        ),
-                                                      )
-                                                    else
-                                                      Icon(
-                                                        Icons.send_rounded,
-                                                        color: Colors.white,
-                                                        size: 16,
-                                                      ),
-                                                    const SizedBox(width: 6),
-                                                    Text(
-                                                      vm.isLoading ? 'Processing' : 'Ask AI',
-                                                      style: const TextStyle(
-                                                        fontSize: 13,
-                                                        color: Colors.white,
-                                                        fontWeight: FontWeight.w700,
-                                                        letterSpacing: 0.3,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ),
+                                IconButton(
+                                  icon: const Icon(Icons.settings, color: Colors.white),
+                                  onPressed: () {
+                                    Navigator.pushNamed(context, AppRouter.settings);
+                                  },
                                 ),
                               ],
                             ),
                           ),
-                        ),
-                      ),
-
-                      const SizedBox(height: 40),
-
-                      // AI Response Section
-                      if (vm.isLoading || vm.response.isNotEmpty)
-                        TweenAnimationBuilder<double>(
-                          tween: Tween(begin: 0, end: 1),
-                          duration: const Duration(milliseconds: 600),
-                          curve: Curves.easeOut,
-                          builder: (context, value, child) {
-                            return Opacity(
-                              opacity: value,
-                              child: Transform.translate(
-                                offset: Offset(0, 30 * (1 - value)),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    _buildModernSectionHeader(
-                                      'AI Response',
-                                      Icons.auto_awesome,
-                                    ),
-                                    const SizedBox(height: 20),
-                                    ClipRRect(
-                                      borderRadius: BorderRadius.circular(28),
-                                      child: BackdropFilter(
-                                        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-                                        child: AnimatedContainer(
-                                          duration: const Duration(milliseconds: 500),
-                                          decoration: BoxDecoration(
-                                            gradient: LinearGradient(
-                                              begin: Alignment.topLeft,
-                                              end: Alignment.bottomRight,
-                                              colors: [
-                                                Color(0xFF667eea).withOpacity(0.1),
-                                                Color(0xFF764ba2).withOpacity(0.05),
-                                              ],
-                                            ),
-                                            borderRadius: BorderRadius.circular(28),
-                                            border: Border.all(
-                                              color: Color(0xFF667eea).withOpacity(0.2),
-                                              width: 1.5,
-                                            ),
-                                          ),
-                                          padding: const EdgeInsets.all(24),
-                                          child: vm.isLoading
-                                              ? Column(
-                                                  children: [
-                                                    Stack(
-                                                      alignment: Alignment.center,
-                                                      children: [
-                                                        SizedBox(
-                                                          height: 50,
-                                                          width: 50,
-                                                          child: CircularProgressIndicator(
-                                                            strokeWidth: 3,
-                                                            valueColor: AlwaysStoppedAnimation<Color>(
-                                                              Color(0xFF667eea),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                        GestureDetector(
-                                                          onTap: () {
-                                                            // Call stop method
-                                                            // vm.stopGeneration();
-                                                          },
-                                                          child: Container(
-                                                            padding: EdgeInsets.all(8),
-                                                            decoration: BoxDecoration(
-                                                              color: Color(0xFFFF6B6B),
-                                                              shape: BoxShape.circle,
-                                                            ),
-                                                            child: Icon(
-                                                              Icons.stop_rounded,
-                                                              color: Colors.white,
-                                                              size: 20,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                    const SizedBox(height: 20),
-                                                    Text(
-                                                      "Analyzing your query with AI...",
-                                                      style: TextStyle(
-                                                        color: Colors.white.withOpacity(0.7),
-                                                        fontSize: 15,
+                          // Tab Bar
+                          TabBar(
+                            controller: _tabController,
+                            indicatorColor: Color(0xFF667eea),
+                            indicatorWeight: 3,
+                            labelColor: Colors.white,
+                            unselectedLabelColor: Colors.white.withOpacity(0.5),
+                            labelStyle: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            unselectedLabelStyle: const TextStyle(
+                              fontSize: 14,
                                                         fontWeight: FontWeight.w500,
                                                       ),
-                                                    ),
-                                                    const SizedBox(height: 12),
-                                                    Text(
-                                                      "Tap the stop icon to cancel",
-                                                      style: TextStyle(
-                                                        color: Colors.white.withOpacity(0.4),
-                                                        fontSize: 12,
-                                                        fontWeight: FontWeight.w400,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                )
-                                              : AnimatedTextKit(
-                                                  isRepeatingAnimation: false,
-                                                  totalRepeatCount: 1,
-                                                  displayFullTextOnTap: true,
-                                                  animatedTexts: [
-                                                    TypewriterAnimatedText(
-                                                      vm.response,
-                                                      textStyle: TextStyle(
-                                                        fontSize: 15,
-                                                        height: 1.8,
-                                                        color: Colors.white.withOpacity(0.9),
-                                                        fontWeight: FontWeight.w400,
-                                                        letterSpacing: 0.3,
-                                                      ),
-                                                      speed: const Duration(milliseconds: 25),
+                            tabs: const [
+                              Tab(text: 'Select Loan Type'),
+                              Tab(text: 'Quick Actions'),
+                            ],
                                                     ),
                                                   ],
                                                 ),
                                         ),
                                       ),
                                     ),
-                                  ],
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-
-                      const SizedBox(height: 60),
-                    ],
-                  ),
+              ),
+              // Tab Bar View
+              Expanded(
+                child: TabBarView(
+                  controller: _tabController,
+                  children: [
+                    // Tab 1: Select Loan Type
+                    _buildLoanTypeTab(vm, loanTypes),
+                    // Tab 2: Quick Actions
+                    _buildQuickActionsTab(context),
+                  ],
                 ),
               ),
             ],
@@ -830,6 +289,584 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildLoanTypeTab(HomeViewModel vm, List<LoanType> loanTypes) {
+    return SingleChildScrollView(
+      physics: const BouncingScrollPhysics(),
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // Modern Section Header
+          _buildModernSectionHeader('Select Loan Type', Icons.apps_rounded),
+          const SizedBox(height: 20),
+          
+          // Premium Loan Cards
+          GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 16,
+              mainAxisSpacing: 16,
+              childAspectRatio: 1.4,
+            ),
+            itemCount: loanTypes.length,
+            itemBuilder: (context, index) {
+              final loan = loanTypes[index];
+              final isSelected = vm.loanType == loan.name;
+              final loanColor = Color(loan.colorValue);
+              
+              return TweenAnimationBuilder<double>(
+                tween: Tween(begin: 0, end: 1),
+                duration: Duration(milliseconds: 400 + (index * 100)),
+                curve: Curves.elasticOut,
+                builder: (context, value, child) {
+                  return Transform.scale(
+                    scale: value,
+                    child: GestureDetector(
+                      onTap: () => vm.setLoanType(loan.name),
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 400),
+                        curve: Curves.easeInOut,
+                        decoration: BoxDecoration(
+                          gradient: isSelected
+                              ? LinearGradient(
+                                  colors: [
+                                    loanColor,
+                                    loanColor.withOpacity(0.7),
+                                  ],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                )
+                              : LinearGradient(
+                                  colors: [
+                                    Color(0xFF1A1A2E),
+                                    Color(0xFF16213E),
+                                  ],
+                                ),
+                          borderRadius: BorderRadius.circular(24),
+                          border: Border.all(
+                            color: isSelected
+                                ? loanColor.withOpacity(0.5)
+                                : Colors.white.withOpacity(0.05),
+                            width: isSelected ? 2 : 1,
+                          ),
+                          boxShadow: isSelected
+                              ? [
+                                  BoxShadow(
+                                    color: loanColor.withOpacity(0.4),
+                                    blurRadius: 25,
+                                    offset: const Offset(0, 12),
+                                  ),
+                                ]
+                              : [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.3),
+                                    blurRadius: 10,
+                                    offset: const Offset(0, 5),
+                                  ),
+                                ],
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(24),
+                          child: BackdropFilter(
+                            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                            child: Container(
+                              padding: const EdgeInsets.all(12),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    loan.emoji,
+                                    style: TextStyle(fontSize: 28),
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Flexible(
+                                    child: Text(
+                                      loan.name,
+                                      textAlign: TextAlign.center,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w700,
+                                        color: Colors.white,
+                                        letterSpacing: 0.3,
+                                        height: 1.2,
+                                      ),
+                                    ),
+                                  ),
+                                  if (isSelected) ...[
+                                    const SizedBox(height: 4),
+                                    Container(
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: 8,
+                                        vertical: 2,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white.withOpacity(0.2),
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: Text(
+                                        '✓',
+                                        style: TextStyle(
+                                          fontSize: 10,
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              );
+            },
+          ),
+
+          const SizedBox(height: 40),
+
+          // Question Section
+          _buildModernSectionHeader('Your Question', Icons.chat_bubble_outline),
+          const SizedBox(height: 20),
+          
+          ClipRRect(
+            borderRadius: BorderRadius.circular(28),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Colors.white.withOpacity(0.1),
+                      Colors.white.withOpacity(0.05),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(28),
+                  border: Border.all(
+                    color: Colors.white.withOpacity(0.1),
+                    width: 1.5,
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(20),
+                      child: TextField(
+                        onChanged: vm.setQuery,
+                        maxLines: 5,
+                        style: const TextStyle(
+                          fontSize: 15,
+                          height: 1.6,
+                          color: Colors.white,
+                        ),
+                        decoration: InputDecoration(
+                          hintText: 'Ask anything about ${vm.loanType.toLowerCase()}...',
+                          hintStyle: TextStyle(
+                            color: Colors.white.withOpacity(0.3),
+                            fontSize: 15,
+                          ),
+                          border: InputBorder.none,
+                          enabledBorder: InputBorder.none,
+                          focusedBorder: InputBorder.none,
+                        ),
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        border: Border(
+                          top: BorderSide(
+                            color: Colors.white.withOpacity(0.1),
+                            width: 1,
+                          ),
+                        ),
+                      ),
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.lightbulb_outline,
+                                  color: Colors.white.withOpacity(0.5),
+                                  size: 16,
+                                ),
+                                SizedBox(width: 6),
+                                Text(
+                                  'Be specific',
+                                  style: TextStyle(
+                                    color: Colors.white.withOpacity(0.5),
+                                    fontSize: 11,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(width: 12),
+                            Row(
+                              children: [
+                                if (vm.isLoading)
+                                  GestureDetector(
+                                    onTap: () {
+                                      // Call stop method if available in your view model
+                                      // vm.stopGeneration();
+                                    },
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 16,
+                                        vertical: 10,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        gradient: LinearGradient(
+                                          colors: [Color(0xFFFF6B6B), Color(0xFFEE5A6F)],
+                                        ),
+                                        borderRadius: BorderRadius.circular(14),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Color(0xFFFF6B6B).withOpacity(0.4),
+                                            blurRadius: 12,
+                                            offset: const Offset(0, 6),
+                                          ),
+                                        ],
+                                      ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Icon(
+                                            Icons.stop_circle_outlined,
+                                            color: Colors.white,
+                                            size: 16,
+                                          ),
+                                          const SizedBox(width: 6),
+                                          Text(
+                                            'Stop',
+                                            style: const TextStyle(
+                                              fontSize: 13,
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.w700,
+                                              letterSpacing: 0.3,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                if (vm.isLoading) const SizedBox(width: 10),
+                                GestureDetector(
+                                  onTap: vm.isLoading ? null : vm.generateContent,
+                                  child: AnimatedContainer(
+                                    duration: const Duration(milliseconds: 300),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 20,
+                                      vertical: 10,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        colors: vm.isLoading
+                                            ? [Colors.grey, Colors.grey.shade700]
+                                            : [Color(0xFF667eea), Color(0xFF764ba2)],
+                                      ),
+                                      borderRadius: BorderRadius.circular(14),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Color(0xFF667eea).withOpacity(0.4),
+                                          blurRadius: 12,
+                                          offset: const Offset(0, 6),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        if (vm.isLoading)
+                                          SizedBox(
+                                            height: 14,
+                                            width: 14,
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2,
+                                              color: Colors.white,
+                                            ),
+                                          )
+                                        else
+                                          Icon(
+                                            Icons.send_rounded,
+                                            color: Colors.white,
+                                            size: 16,
+                                          ),
+                                        const SizedBox(width: 6),
+                                        Text(
+                                          vm.isLoading ? 'Processing' : 'Ask AI',
+                                          style: const TextStyle(
+                                            fontSize: 13,
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.w700,
+                                            letterSpacing: 0.3,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 40),
+
+          // AI Response Section
+          if (vm.isLoading || vm.response.isNotEmpty)
+            TweenAnimationBuilder<double>(
+              tween: Tween(begin: 0, end: 1),
+              duration: const Duration(milliseconds: 600),
+              curve: Curves.easeOut,
+              builder: (context, value, child) {
+                return Opacity(
+                  opacity: value,
+                  child: Transform.translate(
+                    offset: Offset(0, 30 * (1 - value)),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildModernSectionHeader(
+                          'AI Response',
+                          Icons.auto_awesome,
+                        ),
+                        const SizedBox(height: 20),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(28),
+                          child: BackdropFilter(
+                            filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 500),
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                  colors: [
+                                    Color(0xFF667eea).withOpacity(0.1),
+                                    Color(0xFF764ba2).withOpacity(0.05),
+                                  ],
+                                ),
+                                borderRadius: BorderRadius.circular(28),
+                                border: Border.all(
+                                  color: Color(0xFF667eea).withOpacity(0.2),
+                                  width: 1.5,
+                                ),
+                              ),
+                              padding: const EdgeInsets.all(24),
+                              child: vm.isLoading
+                                  ? Column(
+                                      children: [
+                                        Stack(
+                                          alignment: Alignment.center,
+                                          children: [
+                                            SizedBox(
+                                              height: 50,
+                                              width: 50,
+                                              child: CircularProgressIndicator(
+                                                strokeWidth: 3,
+                                                valueColor: AlwaysStoppedAnimation<Color>(
+                                                  Color(0xFF667eea),
+                                                ),
+                                              ),
+                                            ),
+                                            GestureDetector(
+                                              onTap: () {
+                                                // Call stop method
+                                                // vm.stopGeneration();
+                                              },
+                                              child: Container(
+                                                padding: EdgeInsets.all(8),
+                                                decoration: BoxDecoration(
+                                                  color: Color(0xFFFF6B6B),
+                                                  shape: BoxShape.circle,
+                                                ),
+                                                child: Icon(
+                                                  Icons.stop_rounded,
+                                                  color: Colors.white,
+                                                  size: 20,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 20),
+                                        Text(
+                                          "Analyzing your query with AI...",
+                                          style: TextStyle(
+                                            color: Colors.white.withOpacity(0.7),
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 12),
+                                        Text(
+                                          "Tap the stop icon to cancel",
+                                          style: TextStyle(
+                                            color: Colors.white.withOpacity(0.4),
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w400,
+                                          ),
+                                        ),
+                                      ],
+                                    )
+                                  : AnimatedTextKit(
+                                      isRepeatingAnimation: false,
+                                      totalRepeatCount: 1,
+                                      displayFullTextOnTap: true,
+                                      animatedTexts: [
+                                        TypewriterAnimatedText(
+                                          vm.response,
+                                          textStyle: TextStyle(
+                                            fontSize: 15,
+                                            height: 1.8,
+                                            color: Colors.white.withOpacity(0.9),
+                                            fontWeight: FontWeight.w400,
+                                            letterSpacing: 0.3,
+                                          ),
+                                          speed: const Duration(milliseconds: 25),
+                                        ),
+                                      ],
+                                    ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+
+          const SizedBox(height: 60),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildQuickActionsTab(BuildContext context) {
+    return SingleChildScrollView(
+      physics: const BouncingScrollPhysics(),
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // Modern Section Header
+          _buildModernSectionHeader('Quick Actions', Icons.flash_on),
+          const SizedBox(height: 20),
+          Row(
+            children: [
+              Expanded(
+                child: _buildQuickActionCard(
+                  context,
+                  'EMI Calculator',
+                  Icons.calculate,
+                  Color(0xFF667eea),
+                  () => Navigator.pushNamed(context, AppRouter.emiCalculator),
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: _buildQuickActionCard(
+                  context,
+                  'Eligibility',
+                  Icons.verified_user,
+                  Color(0xFFf093fb),
+                  () => Navigator.pushNamed(context, AppRouter.loanEligibility),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: _buildQuickActionCard(
+                  context,
+                  'Compare Loans',
+                  Icons.compare_arrows,
+                  Color(0xFF4ECDC4),
+                  () => Navigator.pushNamed(context, AppRouter.loanComparison),
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: _buildQuickActionCard(
+                  context,
+                  'Documents',
+                  Icons.folder_open,
+                  Color(0xFFFFB84D),
+                  () => Navigator.pushNamed(context, AppRouter.documentChecklist),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          _buildQuickActionCard(
+            context,
+            'Loan Tips & Advice',
+            Icons.lightbulb_outline,
+            Color(0xFFFFD700),
+            () => Navigator.pushNamed(context, AppRouter.loanTips),
+            fullWidth: true,
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: _buildQuickActionCard(
+                  context,
+                  'Amortization',
+                  Icons.table_chart,
+                  Color(0xFF667eea),
+                  () => Navigator.pushNamed(context, AppRouter.amortizationSchedule),
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: _buildQuickActionCard(
+                  context,
+                  'Prepayment',
+                  Icons.trending_down,
+                  Color(0xFF4ECDC4),
+                  () => Navigator.pushNamed(context, AppRouter.prepaymentCalculator),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          _buildQuickActionCard(
+            context,
+            'Banks & NBFCs',
+            Icons.account_balance,
+            Color(0xFFf093fb),
+            () => Navigator.pushNamed(context, AppRouter.bankDirectory),
+            fullWidth: true,
+          ),
+        ],
+      ),
     );
   }
 
