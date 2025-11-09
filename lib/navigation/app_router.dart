@@ -12,6 +12,11 @@ import '../views/onboarding_view.dart';
 import '../views/amortization_schedule_view.dart';
 import '../views/prepayment_calculator_view.dart';
 import '../views/bank_directory_view.dart';
+import '../views/stock_market_dashboard_view.dart';
+import '../views/virtual_portfolio_view.dart';
+import '../views/stock_detail_view.dart';
+import '../views/market_news_view.dart';
+import '../models/stock.dart';
 
 /// App router for navigation
 class AppRouter {
@@ -28,6 +33,10 @@ class AppRouter {
   static const String amortizationSchedule = '/amortization-schedule';
   static const String prepaymentCalculator = '/prepayment-calculator';
   static const String bankDirectory = '/bank-directory';
+  static const String stockMarketDashboard = '/stock-market-dashboard';
+  static const String virtualPortfolio = '/virtual-portfolio';
+  static const String stockDetail = '/stock-detail';
+  static const String marketNews = '/market-news';
 
   static Route<dynamic> generateRoute(RouteSettings routeSettings) {
     final routeName = routeSettings.name;
@@ -58,6 +67,15 @@ class AppRouter {
       return MaterialPageRoute(builder: (_) => const PrepaymentCalculatorView());
     } else if (routeName == bankDirectory) {
       return MaterialPageRoute(builder: (_) => const BankDirectoryView());
+    } else if (routeName == stockMarketDashboard) {
+      return MaterialPageRoute(builder: (_) => const StockMarketDashboardView());
+    } else if (routeName == virtualPortfolio) {
+      return MaterialPageRoute(builder: (_) => const VirtualPortfolioView());
+    } else if (routeName == marketNews) {
+      return MaterialPageRoute(builder: (_) => const MarketNewsView());
+    } else if (routeName == stockDetail) {
+      final stock = routeSettings.arguments as Stock;
+      return MaterialPageRoute(builder: (_) => StockDetailView(stock: stock));
     } else {
       return MaterialPageRoute(
         builder: (_) => Scaffold(

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'view_models/home_view_model.dart';
 import 'view_models/theme_view_model.dart';
 import 'navigation/app_router.dart';
+import 'theme/app_theme.dart';
 
 void main() {
   runApp(
@@ -22,23 +23,17 @@ class LoanAssistantApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer<ThemeViewModel>(
-      builder: (context, themeVm, child) {
-        return MaterialApp(
-          debugShowCheckedModeBanner: false,
-          title: 'Loan Assistant',
-          theme: ThemeData(
-            primarySwatch: Colors.blue,
-            fontFamily: 'Poppins',
-            brightness: Brightness.light,
-          ),
-          darkTheme: ThemeData(
-            primarySwatch: Colors.blue,
-            fontFamily: 'Poppins',
-            brightness: Brightness.dark,
-          ),
-          themeMode: themeVm.isDarkMode ? ThemeMode.dark : ThemeMode.light,
-          initialRoute: AppRouter.splash,
-          onGenerateRoute: AppRouter.generateRoute,
+      builder: (context, themeViewModel, child) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Loan Assistant',
+          theme: AppTheme.getLightTheme(),
+          darkTheme: AppTheme.getDarkTheme(),
+          themeMode: themeViewModel.isDarkMode 
+              ? ThemeMode.dark 
+              : ThemeMode.light,
+      initialRoute: AppRouter.splash,
+      onGenerateRoute: AppRouter.generateRoute,
         );
       },
     );

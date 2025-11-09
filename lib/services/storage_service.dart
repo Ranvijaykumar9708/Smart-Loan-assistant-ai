@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/chat_message.dart';
 import '../models/loan_calculation.dart';
+import '../models/portfolio_holding.dart';
 import '../constants/app_constants.dart';
 
 /// Service for handling local storage operations
@@ -86,12 +87,64 @@ class StorageService {
     }
   }
 
+  /// Save portfolio
+  Future<void> savePortfolio(List<PortfolioHolding> holdings) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final json = jsonEncode(
+        holdings.map((e) => e.toJson()).toList(),
+      );
+      await prefs.setString('portfolio_holdings', json);
+    } catch (e) {
+      throw Exception('Failed to save portfolio: $e');
+    }
+  }
+
+  /// Load portfolio
+  Future<List<PortfolioHolding>> loadPortfolio() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final portfolioJson = prefs.getString('portfolio_holdings');
+
+      if (portfolioJson == null) return [];
+
+      final List<dynamic> decoded = jsonDecode(portfolioJson);
+      return decoded
+          .map((e) => PortfolioHolding.fromJson(e))
+          .toList();
+    } catch (e) {
+      return [];
+    }
+  }
+
+  /// Save virtual balance
+  Future<void> saveVirtualBalance(double balance) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setDouble('virtual_balance', balance);
+    } catch (e) {
+      throw Exception('Failed to save virtual balance: $e');
+    }
+  }
+
+  /// Load virtual balance
+  Future<double> loadVirtualBalance() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      return prefs.getDouble('virtual_balance') ?? 100000.0;
+    } catch (e) {
+      return 100000.0;
+    }
+  }
+
   /// Clear all data
   Future<void> clearAllData() async {
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove(AppConstants.chatHistoryKey);
       await prefs.remove(AppConstants.loanCalculationsKey);
+      await prefs.remove('portfolio_holdings');
+      await prefs.remove('virtual_balance');
     } catch (e) {
       throw Exception('Failed to clear data: $e');
     }

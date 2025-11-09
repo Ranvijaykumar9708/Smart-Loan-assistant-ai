@@ -93,17 +93,57 @@
 
 ### 🎨 Premium UI/UX
 - Modern glassmorphic design throughout
-- Dark/Light theme toggle with persistence
 - Smooth animations and transitions
 - Responsive layout for all screen sizes
 - Animated onboarding experience
-- Tab-based navigation (Select Loan Type & Quick Actions)
+- Tab-based navigation (Select Loan Type, Quick Actions & Stock Market)
 - Floating orbs and gradient backgrounds
+- Dark theme optimized for finance apps
+
+### 📈 Stock Market Dashboard (NEW)
+- Real-time stock market simulation with 10+ popular companies
+- Live price updates every 5 seconds with random fluctuations
+- Top Gainers and Top Losers sections
+- Market summary with Nifty 50 and Sensex indicators
+- Mini sparkline charts for each stock
+- Click on any stock to view detailed information
+- Companies include: TCS, Reliance, Infosys, HDFC Bank, ICICI Bank, HUL, ITC, SBI, Bharti Airtel, L&T
+
+### 💼 Virtual Portfolio (NEW)
+- Start with ₹1,00,000 virtual balance
+- Buy and sell demo stocks with real-time P&L tracking
+- Track holdings with average price, profit/loss, and total portfolio value
+- Portfolio growth chart showing 30-day history
+- Sector allocation pie chart
+- AI-powered portfolio insights and diversification suggestions
+- Persistent portfolio data across app sessions
+
+### 📊 Technical Indicators (NEW)
+- RSI (Relative Strength Index) with overbought/oversold zones
+- Moving Averages (MA10 and MA20)
+- MACD (Moving Average Convergence Divergence)
+- Buy/Sell/Hold signals based on technical analysis
+- Realistic simulated data for each stock
+- Visual indicators with color-coded signals
+
+### 🤖 AI Stock Insights (NEW)
+- AI-generated stock predictions and insights
+- Market sentiment analysis
+- Portfolio diversification recommendations
+- Sector-based investment advice
+- Rotating insights for freshness
+
+### 📰 Market News Feed (NEW)
+- Simulated market news with sentiment analysis
+- Categories: Market, Economy, Global, Tech
+- Color-coded sentiment (🟢 Positive, ⚪ Neutral, 🔴 Negative)
+- AI comments on news articles
+- Filterable by category
+- Today's Market Mood indicator
 
 ### ⚙️ Settings & Data Management
-- Dark/Light theme toggle
 - Clear chat history
-- Clear all app data
+- Clear all app data (including portfolio)
 - Share app functionality
 - App information and version details
 - Developer contact information
@@ -122,7 +162,11 @@ lib/
 │   ├── loan_type.dart
 │   ├── amortization_schedule.dart
 │   ├── prepayment_calculation.dart
-│   └── bank_info.dart
+│   ├── bank_info.dart
+│   ├── stock.dart
+│   ├── portfolio_holding.dart
+│   ├── market_news.dart
+│   └── technical_indicator.dart
 ├── views/               # UI screens
 │   ├── home_view.dart
 │   ├── chat_history_view.dart
@@ -135,6 +179,10 @@ lib/
 │   ├── amortization_schedule_view.dart
 │   ├── prepayment_calculator_view.dart
 │   ├── bank_directory_view.dart
+│   ├── stock_market_dashboard_view.dart
+│   ├── virtual_portfolio_view.dart
+│   ├── stock_detail_view.dart
+│   ├── market_news_view.dart
 │   ├── splash_view.dart
 │   └── onboarding_view.dart
 ├── view_models/         # Business logic (Provider)
@@ -144,7 +192,7 @@ lib/
 │   ├── loan_comparison_view_model.dart
 │   ├── amortization_view_model.dart
 │   ├── prepayment_view_model.dart
-│   └── theme_view_model.dart
+│   └── stock_market_view_model.dart
 ├── services/            # API & local storage
 │   ├── api_service.dart
 │   └── storage_service.dart
@@ -153,7 +201,8 @@ lib/
 ├── utils/               # Helper functions
 │   ├── loan_calculator.dart
 │   ├── amortization_calculator.dart
-│   └── prepayment_calculator.dart
+│   ├── prepayment_calculator.dart
+│   └── dummy_stock_data.dart
 ├── constants/           # App constants
 │   └── app_constants.dart
 └── main.dart
@@ -282,11 +331,19 @@ Where:
 - Search and filter functionality
 - Category-based organization
 
-### 9. Theme Management
-- Dark/Light mode toggle
-- Persistent theme preference
-- Smooth theme transitions
-- System-wide theme application
+### 9. Stock Market Simulation
+- Offline stock market data generation
+- Realistic price fluctuations (±2% range)
+- Technical indicator calculations (RSI, MA, MACD)
+- Portfolio management with virtual balance
+- Persistent portfolio storage
+
+### 10. Virtual Portfolio Management
+- Buy/sell operations with balance tracking
+- Average price calculation for holdings
+- Real-time P&L calculation
+- Sector allocation analysis
+- Portfolio growth visualization
 
 ---
 
@@ -372,7 +429,11 @@ flutter build ios --release
 - [x] Amortization schedule
 - [x] Prepayment calculator
 - [x] Bank/NBFC directory
-- [x] Dark/Light theme toggle
+- [x] Stock Market Dashboard
+- [x] Virtual Portfolio
+- [x] Technical Indicators
+- [x] Market News Feed
+- [x] AI Stock Insights
 - [ ] Multi-language support (i18n)
 - [ ] Firebase authentication
 - [ ] Cloud sync across devices
@@ -470,13 +531,14 @@ For support, email ranvijaykumar9708@gmail.com
 
 ## 📊 Statistics
 
-- **Total Features**: 15+
+- **Total Features**: 20+
 - **Loan Types Supported**: 6
 - **Banks & NBFCs Listed**: 15+
+- **Stocks Available**: 10+
 - **Calculators**: 4 (EMI, Eligibility, Prepayment, Comparison)
-- **Views**: 12+
-- **ViewModels**: 7
-- **Models**: 6
+- **Views**: 16+
+- **ViewModels**: 8
+- **Models**: 10
 
 ---
 
