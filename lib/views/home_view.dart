@@ -52,6 +52,8 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
+      extendBody: true,
+      extendBodyBehindAppBar: false,
       body: Stack(
         children: [
           // Animated Background
@@ -117,7 +119,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
                                 Hero(
                                   tag: 'app_icon',
                                   child: Container(
-                                    padding: const EdgeInsets.all(14),
+                                    padding: const EdgeInsets.all(2),
                                     decoration: BoxDecoration(
                                       gradient: LinearGradient(
                                         colors: AppTheme.getPrimaryGradient(),
@@ -126,7 +128,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
                                       boxShadow: [
                                         BoxShadow(
                                           color: AppTheme.primaryBlue.withOpacity(0.5),
-                                          blurRadius: 20,
+                                          blurRadius: 29,
                                           offset: Offset(0, 10),
                                         ),
                                       ],
@@ -218,63 +220,65 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
       builder: (context) {
         final theme = Theme.of(context);
         final isDark = theme.brightness == Brightness.dark;
-        return ClipRRect(
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(20),
-            topRight: Radius.circular(20),
-          ),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-            child: Container(
-              decoration: BoxDecoration(
-                color: AppTheme.getGlassBackground(isDark),
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(20),
-                  topRight: Radius.circular(20),
-                ),
-                border: Border(
-                  top: BorderSide(
-                    color: AppTheme.getGlassBorder(isDark),
-                    width: 0.5,
-                  ),
-                ),
-              ),
-              child: SafeArea(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      _buildIOSNavItem(
-                        context,
-                        icon: Icons.category_outlined,
-                        activeIcon: Icons.category,
-                        label: 'Loan Type',
-                        index: 0,
+        return Container(
+          color: Colors.transparent,
+          child: SafeArea(
+            top: false,
+            bottom: true,
+            child: Padding(
+              padding: const EdgeInsets.only(left: 16, right: 16, bottom: 6, top: 2),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(25),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: isDark
+                          ? Colors.white.withOpacity(0.08)
+                          : Colors.black.withOpacity(0.03),
+                      borderRadius: BorderRadius.circular(25),
+                      border: Border.all(
+                        color: isDark
+                            ? Colors.white.withOpacity(0.1)
+                            : Colors.black.withOpacity(0.05),
+                        width: 0.5,
                       ),
-                      _buildIOSNavItem(
-                        context,
-                        icon: Icons.flash_on_outlined,
-                        activeIcon: Icons.flash_on,
-                        label: 'Quick Actions',
-                        index: 1,
-                      ),
-                      _buildIOSNavItem(
-                        context,
-                        icon: Icons.trending_up_outlined,
-                        activeIcon: Icons.trending_up,
-                        label: 'Stock Market',
-                        index: 2,
-                      ),
-                      _buildIOSNavItem(
-                        context,
-                        icon: Icons.settings_outlined,
-                        activeIcon: Icons.settings,
-                        label: 'Settings',
-                        index: 3,
-                      ),
-                    ],
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        _buildIOSNavItem(
+                          context,
+                          icon: Icons.category_outlined,
+                          activeIcon: Icons.category,
+                          label: 'Loan Type',
+                          index: 0,
+                        ),
+                        _buildIOSNavItem(
+                          context,
+                          icon: Icons.flash_on_outlined,
+                          activeIcon: Icons.flash_on,
+                          label: 'Quick Actions',
+                          index: 1,
+                        ),
+                        _buildIOSNavItem(
+                          context,
+                          icon: Icons.trending_up_outlined,
+                          activeIcon: Icons.trending_up,
+                          label: 'Stock Market',
+                          index: 2,
+                        ),
+                        _buildIOSNavItem(
+                          context,
+                          icon: Icons.settings_outlined,
+                          activeIcon: Icons.settings,
+                          label: 'Settings',
+                          index: 3,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -294,69 +298,95 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
   }) {
     final isActive = _currentIndex == index;
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     
-    return GestureDetector(
-      onTap: () {
-        // Haptic feedback simulation
-        HapticFeedback.selectionClick();
-        
-        // Navigate directly to Settings or Chat History if those tabs are tapped
-        if (index == 3) {
-          // Settings tab - navigate directly
-          Navigator.pushNamed(context, AppRouter.settings);
-        } else {
-          setState(() {
-            _currentIndex = index;
-          });
-        }
-      },
-      behavior: HitTestBehavior.opaque,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        curve: Curves.easeInOut,
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              curve: Curves.easeInOut,
-              padding: const EdgeInsets.all(6),
-              decoration: BoxDecoration(
-                color: isActive
-                    ? AppTheme.primaryBlue.withOpacity(0.2)
-                    : Colors.transparent,
-                shape: BoxShape.circle,
-                boxShadow: isActive
-                    ? [
-                        BoxShadow(
-                          color: AppTheme.primaryBlue.withOpacity(0.3),
-                          blurRadius: 8,
-                          spreadRadius: 0,
+    // Theme-aware colors
+    final activeColor = isDark ? Colors.white : Colors.black;
+    final inactiveColor = isDark 
+        ? Colors.white.withOpacity(0.6) 
+        : Colors.black.withOpacity(0.6);
+    
+    return Expanded(
+      child: GestureDetector(
+        onTap: () {
+          // Haptic feedback simulation
+          HapticFeedback.selectionClick();
+          
+          // Navigate directly to Settings or Chat History if those tabs are tapped
+          if (index == 3) {
+            // Settings tab - navigate directly
+            Navigator.pushNamed(context, AppRouter.settings);
+          } else {
+            setState(() {
+              _currentIndex = index;
+            });
+          }
+        },
+        behavior: HitTestBehavior.opaque,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOutCubic,
+          padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 2),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Stack(
+                alignment: Alignment.center,
+                children: [
+                  // Glow effect for active item (iridescent blue-green)
+                  if (isActive)
+                    AnimatedContainer(
+                      duration: const Duration(milliseconds: 300),
+                      width: 42,
+                      height: 42,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: RadialGradient(
+                          colors: [
+                            AppTheme.primaryBlue.withOpacity(0.35),
+                            AppTheme.primaryTeal.withOpacity(0.25),
+                            Colors.transparent,
+                          ],
+                          stops: const [0.0, 0.6, 1.0],
                         ),
-                      ]
-                    : [],
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppTheme.primaryBlue.withOpacity(0.5),
+                            blurRadius: 15,
+                            spreadRadius: 1.5,
+                          ),
+                          BoxShadow(
+                            color: AppTheme.primaryTeal.withOpacity(0.4),
+                            blurRadius: 18,
+                            spreadRadius: 1,
+                          ),
+                        ],
+                      ),
+                    ),
+                  // Icon container
+                  AnimatedContainer(
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeInOutCubic,
+                    padding: const EdgeInsets.all(4),
+                    child: Icon(
+                      isActive ? activeIcon : icon,
+                      color: isActive ? activeColor : inactiveColor,
+                      size: 20,
+                    ),
+                  ),
+                ],
               ),
-              child: Icon(
-                isActive ? activeIcon : icon,
-                color: isActive
-                    ? AppTheme.primaryBlue
-                    : theme.colorScheme.onSurface.withOpacity(0.7),
-                size: 24,
-              ),
-            ),
-            const SizedBox(height: 3),
-            Flexible(
-              child: AnimatedDefaultTextStyle(
-                duration: const Duration(milliseconds: 200),
+              const SizedBox(height: 2),
+              AnimatedDefaultTextStyle(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOutCubic,
                 style: TextStyle(
-                  fontSize: isActive ? 11 : 10,
+                  fontSize: isActive ? 9 : 8,
                   fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
-                  color: isActive
-                      ? AppTheme.primaryBlue
-                      : theme.colorScheme.onSurface.withOpacity(0.7),
+                  color: isActive ? activeColor : inactiveColor,
                   letterSpacing: -0.2,
+                  height: 1.0,
                 ),
                 child: Text(
                   label,
@@ -365,8 +395,8 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -443,7 +473,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
             children: [
               // Modern Section Header
               _buildModernSectionHeader('Select Loan Type', Icons.apps_rounded, context),
-              const SizedBox(height: 20),
+              const SizedBox(height: 2),
               
               // Premium Loan Cards
               GridView.builder(
@@ -648,9 +678,8 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
                                             Icon(
                                               Icons.lightbulb_outline,
                                               color: theme.colorScheme.onSurface.withOpacity(0.5),
-                                              size: 16,
+                                              size: 10,
                                             ),
-                                            SizedBox(width: 6),
                                             Text(
                                               'Be specific',
                                               style: theme.textTheme.bodySmall?.copyWith(
@@ -752,9 +781,9 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
                                                       ),
                                                     const SizedBox(width: 6),
                                                     Text(
-                                                      vm.isLoading ? 'Processing' : 'Ask AI',
+                                                      vm.isLoading ? 'Processing' : 'Ask Ai',
                                                       style: const TextStyle(
-                                                        fontSize: 13,
+                                                        fontSize: 10,
                                                         color: Colors.white,
                                                         fontWeight: FontWeight.w700,
                                                         letterSpacing: 0.3,
@@ -926,22 +955,44 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
           Row(
             children: [
               Expanded(
-                child: _buildQuickActionCard(
-                  context,
-                  'EMI Calculator',
-                  Icons.calculate,
-                  AppTheme.primaryBlue,
-                  () => Navigator.pushNamed(context, AppRouter.emiCalculator),
+                child: TweenAnimationBuilder<double>(
+                  tween: Tween(begin: 0, end: 1),
+                  duration: const Duration(milliseconds: 400),
+                  curve: Curves.elasticOut,
+                  builder: (context, value, child) {
+                    return Transform.scale(
+                      scale: value,
+                      child: child,
+                    );
+                  },
+                  child: _buildQuickActionCard(
+                    context,
+                    'EMI Calculator',
+                    Icons.calculate,
+                    AppTheme.primaryBlue,
+                    () => Navigator.pushNamed(context, AppRouter.emiCalculator),
+                  ),
                 ),
               ),
               const SizedBox(width: 16),
               Expanded(
-                child: _buildQuickActionCard(
-                  context,
-                  'Eligibility',
-                  Icons.verified_user,
-                  AppTheme.primaryPink,
-                  () => Navigator.pushNamed(context, AppRouter.loanEligibility),
+                child: TweenAnimationBuilder<double>(
+                  tween: Tween(begin: 0, end: 1),
+                  duration: const Duration(milliseconds: 500),
+                  curve: Curves.elasticOut,
+                  builder: (context, value, child) {
+                    return Transform.scale(
+                      scale: value,
+                      child: child,
+                    );
+                  },
+                  child: _buildQuickActionCard(
+                    context,
+                    'Eligibility',
+                    Icons.verified_user,
+                    AppTheme.primaryPink,
+                    () => Navigator.pushNamed(context, AppRouter.loanEligibility),
+                  ),
                 ),
               ),
             ],
@@ -950,67 +1001,133 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
           Row(
             children: [
               Expanded(
-                child: _buildQuickActionCard(
-                  context,
-                  'Compare Loans',
-                  Icons.compare_arrows,
-                  AppTheme.primaryTeal,
-                  () => Navigator.pushNamed(context, AppRouter.loanComparison),
+                child: TweenAnimationBuilder<double>(
+                  tween: Tween(begin: 0, end: 1),
+                  duration: const Duration(milliseconds: 600),
+                  curve: Curves.elasticOut,
+                  builder: (context, value, child) {
+                    return Transform.scale(
+                      scale: value,
+                      child: child,
+                    );
+                  },
+                  child: _buildQuickActionCard(
+                    context,
+                    'Compare Loans',
+                    Icons.compare_arrows,
+                    AppTheme.primaryTeal,
+                    () => Navigator.pushNamed(context, AppRouter.loanComparison),
+                  ),
                 ),
               ),
               const SizedBox(width: 16),
               Expanded(
-                child: _buildQuickActionCard(
-                  context,
-                  'Documents',
-                  Icons.folder_open,
-                  AppTheme.primaryOrange,
-                  () => Navigator.pushNamed(context, AppRouter.documentChecklist),
+                child: TweenAnimationBuilder<double>(
+                  tween: Tween(begin: 0, end: 1),
+                  duration: const Duration(milliseconds: 700),
+                  curve: Curves.elasticOut,
+                  builder: (context, value, child) {
+                    return Transform.scale(
+                      scale: value,
+                      child: child,
+                    );
+                  },
+                  child: _buildQuickActionCard(
+                    context,
+                    'Documents',
+                    Icons.folder_open,
+                    AppTheme.primaryOrange,
+                    () => Navigator.pushNamed(context, AppRouter.documentChecklist),
+                  ),
                 ),
               ),
             ],
           ),
           const SizedBox(height: 16),
-          _buildQuickActionCard(
-            context,
-            'Loan Tips & Advice',
-            Icons.lightbulb_outline,
-            AppTheme.primaryGold,
-            () => Navigator.pushNamed(context, AppRouter.loanTips),
-            fullWidth: true,
+          TweenAnimationBuilder<double>(
+            tween: Tween(begin: 0, end: 1),
+            duration: const Duration(milliseconds: 800),
+            curve: Curves.elasticOut,
+            builder: (context, value, child) {
+              return Transform.scale(
+                scale: value,
+                child: child,
+              );
+            },
+            child: _buildQuickActionCard(
+              context,
+              'Loan Tips & Advice',
+              Icons.lightbulb_outline,
+              AppTheme.primaryGold,
+              () => Navigator.pushNamed(context, AppRouter.loanTips),
+              fullWidth: true,
+            ),
           ),
           const SizedBox(height: 16),
           Row(
             children: [
               Expanded(
-                child: _buildQuickActionCard(
-                  context,
-                  'Amortization',
-                  Icons.table_chart,
-                  AppTheme.primaryBlue,
-                  () => Navigator.pushNamed(context, AppRouter.amortizationSchedule),
+                child: TweenAnimationBuilder<double>(
+                  tween: Tween(begin: 0, end: 1),
+                  duration: const Duration(milliseconds: 900),
+                  curve: Curves.elasticOut,
+                  builder: (context, value, child) {
+                    return Transform.scale(
+                      scale: value,
+                      child: child,
+                    );
+                  },
+                  child: _buildQuickActionCard(
+                    context,
+                    'Amortization',
+                    Icons.table_chart,
+                    AppTheme.primaryBlue,
+                    () => Navigator.pushNamed(context, AppRouter.amortizationSchedule),
+                  ),
                 ),
               ),
               const SizedBox(width: 16),
               Expanded(
-                child: _buildQuickActionCard(
-                  context,
-                  'Prepayment',
-                  Icons.trending_down,
-                  AppTheme.primaryTeal,
-                  () => Navigator.pushNamed(context, AppRouter.prepaymentCalculator),
+                child: TweenAnimationBuilder<double>(
+                  tween: Tween(begin: 0, end: 1),
+                  duration: const Duration(milliseconds: 1000),
+                  curve: Curves.elasticOut,
+                  builder: (context, value, child) {
+                    return Transform.scale(
+                      scale: value,
+                      child: child,
+                    );
+                  },
+                  child: _buildQuickActionCard(
+                    context,
+                    'Prepayment',
+                    Icons.trending_down,
+                    AppTheme.primaryTeal,
+                    () => Navigator.pushNamed(context, AppRouter.prepaymentCalculator),
+                  ),
                 ),
               ),
             ],
           ),
           const SizedBox(height: 16),
-          _buildQuickActionCard(
-            context,
-            'Banks & NBFCs',
-            Icons.account_balance,
-            AppTheme.primaryPink,
-            () => Navigator.pushNamed(context, AppRouter.bankDirectory),
-            fullWidth: true,
+          TweenAnimationBuilder<double>(
+            tween: Tween(begin: 0, end: 1),
+            duration: const Duration(milliseconds: 1100),
+            curve: Curves.elasticOut,
+            builder: (context, value, child) {
+              return Transform.scale(
+                scale: value,
+                child: child,
+              );
+            },
+            child: _buildQuickActionCard(
+              context,
+              'Banks & NBFCs',
+              Icons.account_balance,
+              AppTheme.primaryPink,
+              () => Navigator.pushNamed(context, AppRouter.bankDirectory),
+              fullWidth: true,
+            ),
           ),
         ],
       ),
@@ -1099,22 +1216,44 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
                 Row(
                   children: [
                     Expanded(
-                      child: _buildStockActionCard(
-                        context,
-                        'Dashboard',
-                        Icons.dashboard,
-                        AppTheme.primaryBlue,
-                        () => Navigator.pushNamed(context, AppRouter.stockMarketDashboard),
+                      child: TweenAnimationBuilder<double>(
+                        tween: Tween(begin: 0, end: 1),
+                        duration: const Duration(milliseconds: 400),
+                        curve: Curves.elasticOut,
+                        builder: (context, value, child) {
+                          return Transform.scale(
+                            scale: value,
+                            child: child,
+                          );
+                        },
+                        child: _buildStockActionCard(
+                          context,
+                          'Dashboard',
+                          Icons.dashboard,
+                          AppTheme.primaryBlue,
+                          () => Navigator.pushNamed(context, AppRouter.stockMarketDashboard),
+                        ),
                       ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
-                      child: _buildStockActionCard(
-                        context,
-                        'Portfolio',
-                        Icons.account_balance_wallet,
-                        AppTheme.primaryTeal,
-                        () => Navigator.pushNamed(context, AppRouter.virtualPortfolio),
+                      child: TweenAnimationBuilder<double>(
+                        tween: Tween(begin: 0, end: 1),
+                        duration: const Duration(milliseconds: 500),
+                        curve: Curves.elasticOut,
+                        builder: (context, value, child) {
+                          return Transform.scale(
+                            scale: value,
+                            child: child,
+                          );
+                        },
+                        child: _buildStockActionCard(
+                          context,
+                          'Portfolio',
+                          Icons.account_balance_wallet,
+                          AppTheme.primaryTeal,
+                          () => Navigator.pushNamed(context, AppRouter.virtualPortfolio),
+                        ),
                       ),
                     ),
                   ],
@@ -1123,22 +1262,44 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
                 Row(
                   children: [
                     Expanded(
-                      child: _buildStockActionCard(
-                        context,
-                        'News',
-                        Icons.newspaper,
-                        AppTheme.primaryPink,
-                        () => Navigator.pushNamed(context, AppRouter.marketNews),
+                      child: TweenAnimationBuilder<double>(
+                        tween: Tween(begin: 0, end: 1),
+                        duration: const Duration(milliseconds: 600),
+                        curve: Curves.elasticOut,
+                        builder: (context, value, child) {
+                          return Transform.scale(
+                            scale: value,
+                            child: child,
+                          );
+                        },
+                        child: _buildStockActionCard(
+                          context,
+                          'News',
+                          Icons.newspaper,
+                          AppTheme.primaryPink,
+                          () => Navigator.pushNamed(context, AppRouter.marketNews),
+                        ),
                       ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
-                      child: _buildStockActionCard(
-                        context,
-                        'AI Insights',
-                        Icons.auto_awesome,
-                        AppTheme.primaryOrange,
-                        () => _showAIInsights(context, vm),
+                      child: TweenAnimationBuilder<double>(
+                        tween: Tween(begin: 0, end: 1),
+                        duration: const Duration(milliseconds: 700),
+                        curve: Curves.elasticOut,
+                        builder: (context, value, child) {
+                          return Transform.scale(
+                            scale: value,
+                            child: child,
+                          );
+                        },
+                        child: _buildStockActionCard(
+                          context,
+                          'AI Insights',
+                          Icons.auto_awesome,
+                          AppTheme.primaryOrange,
+                          () => _showAIInsights(context, vm),
+                        ),
                       ),
                     ),
                   ],
