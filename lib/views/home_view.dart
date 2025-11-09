@@ -162,7 +162,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
                                         child: const Text(
                                           "Loan Advisor",
                                           style: TextStyle(
-                                            fontSize: 34,
+                                            fontSize: 30,
                                             color: Colors.white,
                                             fontWeight: FontWeight.w900,
                                             letterSpacing: -1,

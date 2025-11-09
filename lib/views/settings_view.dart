@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 import '../view_models/home_view_model.dart';
+import '../view_models/theme_view_model.dart';
 import '../services/storage_service.dart';
 
 /// Settings view with glassmorphism design
@@ -31,6 +32,16 @@ class SettingsView extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
+          // Appearance Section
+          _buildSectionHeader('Appearance'),
+          const SizedBox(height: 12),
+          Consumer<ThemeViewModel>(
+            builder: (context, themeVm, child) {
+              return _buildThemeToggleCard(context, themeVm);
+            },
+          ),
+          const SizedBox(height: 32),
+
           // Data Management Section
           _buildSectionHeader('Data Management'),
           const SizedBox(height: 12),
@@ -250,7 +261,7 @@ class SettingsView extends StatelessWidget {
                       value,
                       style: TextStyle(
                         color: Colors.white.withOpacity(0.9),
-                        fontSize: 16,
+                        fontSize: 15,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -340,6 +351,79 @@ class SettingsView extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildThemeToggleCard(BuildContext context, ThemeViewModel themeVm) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(20),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Color(0xFF667eea).withOpacity(0.2),
+                Color(0xFF764ba2).withOpacity(0.1),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: Color(0xFF667eea).withOpacity(0.3),
+              width: 1.5,
+            ),
+          ),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Color(0xFF667eea).withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  themeVm.isDarkMode ? Icons.dark_mode : Icons.light_mode,
+                  color: Color(0xFF667eea),
+                  size: 24,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Theme',
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.9),
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      themeVm.isDarkMode ? 'Dark Mode' : 'Light Mode',
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.6),
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Switch(
+                value: themeVm.isDarkMode,
+                onChanged: (value) => themeVm.toggleTheme(),
+                activeColor: Color(0xFF667eea),
+                activeTrackColor: Color(0xFF764ba2),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
