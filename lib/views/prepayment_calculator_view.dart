@@ -1,25 +1,23 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:fl_chart/fl_chart.dart';
-import '../view_models/emi_calculator_view_model.dart';
-import '../navigation/app_router.dart';
+import '../view_models/prepayment_view_model.dart';
 
-/// EMI Calculator view with glassmorphism design
-class EmiCalculatorView extends StatelessWidget {
-  const EmiCalculatorView({super.key});
+/// Prepayment calculator view with glassmorphism design
+class PrepaymentCalculatorView extends StatelessWidget {
+  const PrepaymentCalculatorView({super.key});
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => EmiCalculatorViewModel(),
+      create: (_) => PrepaymentViewModel(),
       child: Scaffold(
         backgroundColor: const Color(0xFF0F0F1E),
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
           title: const Text(
-            'EMI Calculator',
+            'Prepayment Calculator',
             style: TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,
@@ -30,10 +28,10 @@ class EmiCalculatorView extends StatelessWidget {
             onPressed: () => Navigator.pop(context),
           ),
         ),
-        body: Consumer<EmiCalculatorViewModel>(
+        body: Consumer<PrepaymentViewModel>(
           builder: (context, vm, child) {
-            final calculation = vm.currentCalculation;
-            if (calculation == null) {
+            final calc = vm.calculation;
+            if (calc == null) {
               return const Center(child: CircularProgressIndicator());
             }
 
@@ -42,15 +40,11 @@ class EmiCalculatorView extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // EMI Result Card
-                  _buildResultCard(calculation),
+                  // Savings Card
+                  _buildSavingsCard(calc),
                   const SizedBox(height: 24),
 
-                  // Pie Chart
-                  _buildPieChart(calculation),
-                  const SizedBox(height: 24),
-
-                  // Input Sliders
+                  // Input Cards
                   _buildInputCard(
                     'Loan Amount',
                     '₹${vm.loanAmount.toStringAsFixed(0)}',
@@ -77,7 +71,7 @@ class EmiCalculatorView extends StatelessWidget {
 
                   _buildInputCard(
                     'Loan Tenure',
-                    '${vm.tenureMonths.toInt()} months (${(vm.tenureMonths / 12).toStringAsFixed(1)} years)',
+                    '${vm.tenureMonths.toInt()} months',
                     vm.tenureMonths,
                     6,
                     360,
@@ -85,14 +79,34 @@ class EmiCalculatorView extends StatelessWidget {
                     Icons.calendar_today,
                     vm.setTenureMonths,
                   ),
+                  const SizedBox(height: 16),
+
+                  _buildInputCard(
+                    'Prepayment Amount',
+                    '₹${vm.prepaymentAmount.toStringAsFixed(0)}',
+                    vm.prepaymentAmount,
+                    10000,
+                    5000000,
+                    10000,
+                    Icons.payment,
+                    vm.setPrepaymentAmount,
+                  ),
+                  const SizedBox(height: 16),
+
+                  _buildInputCard(
+                    'Prepayment Month',
+                    'Month ${vm.prepaymentMonth}',
+                    vm.prepaymentMonth.toDouble(),
+                    1,
+                    vm.tenureMonths,
+                    1,
+                    Icons.schedule,
+                    (value) => vm.setPrepaymentMonth(value.toInt()),
+                  ),
                   const SizedBox(height: 24),
 
-                  // Breakdown Card
-                  _buildBreakdownCard(calculation),
-                  const SizedBox(height: 24),
-
-                  // View Amortization Schedule Button
-                  _buildViewScheduleButton(context),
+                  // Comparison Card
+                  _buildComparisonCard(vm, calc),
                 ],
               ),
             );
@@ -102,64 +116,7 @@ class EmiCalculatorView extends StatelessWidget {
     );
   }
 
-  Widget _buildViewScheduleButton(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(20),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-        child: Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [Color(0xFF667eea), Color(0xFF764ba2)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: const Color(0xFF667eea).withOpacity(0.4),
-                blurRadius: 15,
-                offset: const Offset(0, 8),
-              ),
-            ],
-          ),
-          child: InkWell(
-            onTap: () {
-              Navigator.pushNamed(context, AppRouter.amortizationSchedule);
-            },
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(
-                  Icons.table_chart,
-                  color: Colors.white,
-                  size: 24,
-                ),
-                const SizedBox(width: 12),
-                const Text(
-                  'View Amortization Schedule',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Icon(
-                  Icons.arrow_forward,
-                  color: Colors.white.withOpacity(0.7),
-                  size: 20,
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildResultCard(calculation) {
+  Widget _buildSavingsCard(calc) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(24),
       child: BackdropFilter(
@@ -168,14 +125,14 @@ class EmiCalculatorView extends StatelessWidget {
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
             gradient: const LinearGradient(
-              colors: [Color(0xFF667eea), Color(0xFF764ba2)],
+              colors: [Color(0xFF4ECDC4), Color(0xFF44A08D)],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
             borderRadius: BorderRadius.circular(24),
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFF667eea).withOpacity(0.4),
+                color: const Color(0xFF4ECDC4).withOpacity(0.4),
                 blurRadius: 20,
                 offset: const Offset(0, 10),
               ),
@@ -184,7 +141,7 @@ class EmiCalculatorView extends StatelessWidget {
           child: Column(
             children: [
               Text(
-                'Monthly EMI',
+                'Total Savings',
                 style: TextStyle(
                   color: Colors.white.withOpacity(0.9),
                   fontSize: 16,
@@ -193,13 +150,21 @@ class EmiCalculatorView extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               Text(
-                '₹${calculation.emi.toStringAsFixed(0)}',
+                '₹${calc.totalSavings.toStringAsFixed(0)}',
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 42,
                   fontWeight: FontWeight.w900,
                   letterSpacing: -1,
                 ),
+              ),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _buildSavingsItem('Interest Saved', '₹${calc.interestSaved.toStringAsFixed(0)}'),
+                  _buildSavingsItem('Months Reduced', '${calc.monthsReduced}'),
+                ],
               ),
             ],
           ),
@@ -208,53 +173,26 @@ class EmiCalculatorView extends StatelessWidget {
     );
   }
 
-  Widget _buildPieChart(calculation) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(24),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-        child: Container(
-          height: 280,
-          padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.05),
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(
-              color: Colors.white.withOpacity(0.1),
-            ),
-          ),
-          child: PieChart(
-            PieChartData(
-              sectionsSpace: 2,
-              centerSpaceRadius: 60,
-              sections: [
-                PieChartSectionData(
-                  value: calculation.loanAmount,
-                  title: 'Principal\n₹${(calculation.loanAmount / 100000).toStringAsFixed(1)}L',
-                  color: const Color(0xFF667eea),
-                  radius: 70,
-                  titleStyle: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-                PieChartSectionData(
-                  value: calculation.totalInterest,
-                  title: 'Interest\n₹${(calculation.totalInterest / 100000).toStringAsFixed(1)}L',
-                  color: const Color(0xFFf093fb),
-                  radius: 70,
-                  titleStyle: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-              ],
-            ),
+  Widget _buildSavingsItem(String label, String value) {
+    return Column(
+      children: [
+        Text(
+          value,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
           ),
         ),
-      ),
+        const SizedBox(height: 4),
+        Text(
+          label,
+          style: TextStyle(
+            color: Colors.white.withOpacity(0.7),
+            fontSize: 12,
+          ),
+        ),
+      ],
     );
   }
 
@@ -323,10 +261,10 @@ class EmiCalculatorView extends StatelessWidget {
               const SizedBox(height: 16),
               SliderTheme(
                 data: SliderThemeData(
-                  activeTrackColor: const Color(0xFF667eea),
+                  activeTrackColor: const Color(0xFF4ECDC4),
                   inactiveTrackColor: Colors.white.withOpacity(0.1),
-                  thumbColor: const Color(0xFF667eea),
-                  overlayColor: const Color(0xFF667eea).withOpacity(0.2),
+                  thumbColor: const Color(0xFF4ECDC4),
+                  overlayColor: const Color(0xFF4ECDC4).withOpacity(0.2),
                   thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 10),
                   trackHeight: 6,
                 ),
@@ -345,7 +283,7 @@ class EmiCalculatorView extends StatelessWidget {
     );
   }
 
-  Widget _buildBreakdownCard(calculation) {
+  Widget _buildComparisonCard(PrepaymentViewModel vm, calc) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(20),
       child: BackdropFilter(
@@ -363,7 +301,7 @@ class EmiCalculatorView extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Payment Breakdown',
+                'Before vs After Prepayment',
                 style: TextStyle(
                   color: Colors.white.withOpacity(0.9),
                   fontSize: 18,
@@ -371,32 +309,11 @@ class EmiCalculatorView extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 20),
-              _buildBreakdownRow(
-                'Loan Amount',
-                '₹${calculation.loanAmount.toStringAsFixed(0)}',
-                const Color(0xFF667eea),
-              ),
+              _buildComparisonRow('EMI', '₹${calc.originalEMI.toStringAsFixed(0)}', '₹${calc.newEMI.toStringAsFixed(0)}'),
               const SizedBox(height: 16),
-              _buildBreakdownRow(
-                'Total Interest',
-                '₹${calculation.totalInterest.toStringAsFixed(0)}',
-                const Color(0xFFf093fb),
-              ),
+              _buildComparisonRow('Interest Saved', '-', '₹${calc.interestSaved.toStringAsFixed(0)}'),
               const SizedBox(height: 16),
-              _buildBreakdownRow(
-                'Total Payment',
-                '₹${calculation.totalPayment.toStringAsFixed(0)}',
-                const Color(0xFF4ECDC4),
-              ),
-              const SizedBox(height: 16),
-              const Divider(color: Colors.white24),
-              const SizedBox(height: 16),
-              _buildBreakdownRow(
-                'Monthly EMI',
-                '₹${calculation.emi.toStringAsFixed(0)}',
-                Colors.white,
-                isHighlight: true,
-              ),
+              _buildComparisonRow('Tenure', '${vm.tenureMonths.toInt()} months', '${(vm.tenureMonths - calc.monthsReduced).toInt()} months'),
             ],
           ),
         ),
@@ -404,43 +321,37 @@ class EmiCalculatorView extends StatelessWidget {
     );
   }
 
-  Widget _buildBreakdownRow(
-    String label,
-    String value,
-    Color color, {
-    bool isHighlight = false,
-  }) {
+  Widget _buildComparisonRow(String label, String before, String after) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
+        Text(
+          label,
+          style: TextStyle(
+            color: Colors.white.withOpacity(0.7),
+            fontSize: 14,
+          ),
+        ),
         Row(
           children: [
-            Container(
-              width: 8,
-              height: 8,
-              decoration: BoxDecoration(
-                color: color,
-                shape: BoxShape.circle,
+            Text(
+              before,
+              style: TextStyle(
+                color: Colors.white.withOpacity(0.5),
+                fontSize: 14,
+                decoration: TextDecoration.lineThrough,
               ),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 16),
             Text(
-              label,
-              style: TextStyle(
-                color: Colors.white.withOpacity(0.7),
-                fontSize: isHighlight ? 16 : 14,
-                fontWeight: isHighlight ? FontWeight.w700 : FontWeight.w500,
+              after,
+              style: const TextStyle(
+                color: Color(0xFF4ECDC4),
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
               ),
             ),
           ],
-        ),
-        Text(
-          value,
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: isHighlight ? 18 : 15,
-            fontWeight: FontWeight.w700,
-          ),
         ),
       ],
     );

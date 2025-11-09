@@ -402,6 +402,39 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
                         () => Navigator.pushNamed(context, AppRouter.loanTips),
                         fullWidth: true,
                       ),
+                      const SizedBox(height: 16),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _buildQuickActionCard(
+                              context,
+                              'Amortization',
+                              Icons.table_chart,
+                              Color(0xFF667eea),
+                              () => Navigator.pushNamed(context, AppRouter.amortizationSchedule),
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: _buildQuickActionCard(
+                              context,
+                              'Prepayment',
+                              Icons.trending_down,
+                              Color(0xFF4ECDC4),
+                              () => Navigator.pushNamed(context, AppRouter.prepaymentCalculator),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      _buildQuickActionCard(
+                        context,
+                        'Banks & NBFCs',
+                        Icons.account_balance,
+                        Color(0xFFf093fb),
+                        () => Navigator.pushNamed(context, AppRouter.bankDirectory),
+                        fullWidth: true,
+                      ),
 
                       const SizedBox(height: 40),
 
@@ -848,7 +881,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
                     title,
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 14,
+                      fontSize: 13,
                       fontWeight: FontWeight.w700,
                       letterSpacing: 0.3,
                     ),

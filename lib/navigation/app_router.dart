@@ -9,6 +9,9 @@ import '../views/loan_tips_view.dart';
 import '../views/settings_view.dart';
 import '../views/splash_view.dart';
 import '../views/onboarding_view.dart';
+import '../views/amortization_schedule_view.dart';
+import '../views/prepayment_calculator_view.dart';
+import '../views/bank_directory_view.dart';
 
 /// App router for navigation
 class AppRouter {
@@ -22,6 +25,9 @@ class AppRouter {
   static const String documentChecklist = '/document-checklist';
   static const String loanTips = '/loan-tips';
   static const String settings = '/settings';
+  static const String amortizationSchedule = '/amortization-schedule';
+  static const String prepaymentCalculator = '/prepayment-calculator';
+  static const String bankDirectory = '/bank-directory';
 
   static Route<dynamic> generateRoute(RouteSettings routeSettings) {
     final routeName = routeSettings.name;
@@ -46,6 +52,12 @@ class AppRouter {
       return MaterialPageRoute(builder: (_) => const LoanTipsView());
     } else if (routeName == settings) {
       return MaterialPageRoute(builder: (_) => const SettingsView());
+    } else if (routeName == amortizationSchedule) {
+      return MaterialPageRoute(builder: (_) => const AmortizationScheduleView());
+    } else if (routeName == prepaymentCalculator) {
+      return MaterialPageRoute(builder: (_) => const PrepaymentCalculatorView());
+    } else if (routeName == bankDirectory) {
+      return MaterialPageRoute(builder: (_) => const BankDirectoryView());
     } else {
       return MaterialPageRoute(
         builder: (_) => Scaffold(
